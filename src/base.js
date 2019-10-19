@@ -1,0 +1,2 @@
+let assets = [];
+let elements = [];

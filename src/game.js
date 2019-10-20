@@ -128,7 +128,7 @@ class SceneC extends Phaser.Scene {
         this.add.bitmapText(width/2, height/2+150+offY, 'carrier_command','TOP PLAYERS', 15).setOrigin(0.5);
         var person = prompt("Please enter your name", sessionStorage.getItem('name') || '');
         
-        if (person != null) {
+        if (person != null && score > 0) {
             let sc = new Score(person, score);
             sc.upload();
             let me;

@@ -12,22 +12,22 @@ let config = {
     scene: {
         preload: preload,
         create: create,
-        update: update
+        update: update,
+        extend: {
+            text: null
+        }
     }
 };
 
+let {width, height} = {width: 0, height: 0};
 
 let game = new Phaser.Game(config);
 
 function preload ()
 {
 
-    this.load.image('ground', 'assets/platform.png');
-    // this.load.image('star', 'assets/star.png');
-    this.load.image('bomb', 'assets/bomb.png');
     this.load.image('nave', 'assets/nave.png');
     this.load.image('lixo', 'assets/lixo.png');
-    // this.load.image('rede', 'assets/rede.png');
     this.load.image('star', 'assets/star2.png');
     this.load.spritesheet('rede', 
         'assets/spritesheet.png',
@@ -38,15 +38,11 @@ function preload ()
 let angle = 0;
 function createStarfield ()
 {
-    //  Starfield background
-
-    //  Note the scrollFactor values which give them their 'parallax' effect
 
     var group = this.add.group({ key: 'star', frameQuantity: 256 });
 
-    // group.createMultiple({ key: 'bigStar', frameQuantity: 32 });
+    var rect = new Phaser.Geom.Rectangle(0, 0, 3200, height);
 
-    var rect = new Phaser.Geom.Rectangle(0, 0, 3200, 550);
 
     Phaser.Actions.RandomRectangle(group.getChildren(), rect);
 
@@ -61,8 +57,6 @@ function createStarfield ()
 
         child.setScrollFactor(sf);
 
-        // this.minimap.ignore(child);
-
     }, this);
 }
 
@@ -70,13 +64,13 @@ function create ()
 {
 
 
-    let {width, height} = this.sys.game.canvas;
-
+     width = this.sys.game.canvas.width;
+     height = this.sys.game.canvas.height;
     // ================ SCENARIO ============================================
     
 
-    // ================ CREATE STARFIELD ====================================
-    createStarfield.bind(this)();
+    // ================ CREATE STARFIELD ======================
+    // createStarfield.bind(this)();
 
     ship = this.physics.add.staticGroup();
 
@@ -114,46 +108,27 @@ function create ()
         repeat: -1
     });
 
-    // ================ COLLECTABLES ============================================
-    // stars = this.physics.add.group({
-    //     key: 'lixo',
-    //     repeat: 0,
-    //     setXY: { x: width, y: 0, stepY: 70 }
-    // });
-    
-    // stars.children.iterate(function (child) {
-    
-    //     child.angle = angle + 90;
-    //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-    //     child.setVelocityX(Phaser.Math.FloatBetween(-10, -50));
-    
-    // });
-
-
     // ================ COLLISION ============================================
     this.physics.add.collider(player, ship);
-    // this.physics.add.overlap(player, stars, collectStar, null, this);
 
     // ================ CONTROLS ============================================
     cursors = this.input.keyboard.createCursorKeys();
 
+    // ================ SCORE =========================
+    this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' }).setDepth(1).setScrollFactor(0);
+
 }
 
-function collectStar (player, star)
-{
-    star.disableBody(true, true);
-}
 
 let arrayJunk = [];
 let arrayJunk2 = [];
 
 let spawnId = 0;
 
-function spawn(position,minVelocity, maxVelocity) {
+function spawn(position,minVelocity, maxVelocity, key, collision) {
     enemies = this.physics.add.group({
-        key: 'lixo',
-        // repeat: 1,
-        setXY: { x: position, y: Phaser.Math.FloatBetween(0, 600), stepY: Phaser.Math.FloatBetween(20, 70) }
+        key: key,
+        setXY: { x: position, y: Phaser.Math.FloatBetween(30, height-20), stepY: Phaser.Math.FloatBetween(20, 70) }
     });
     
     enemies.children.iterate(function (child) {
@@ -161,9 +136,13 @@ function spawn(position,minVelocity, maxVelocity) {
         child.setScale(0.5);
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         child.setVelocityX(Phaser.Math.FloatBetween(minVelocity, maxVelocity));
+        child.depth = -1;
     
     });
-    this.physics.add.overlap(player, enemies, collectStar, null, this);
+    if (collision) {
+        this.physics.add.overlap(player, enemies, scoring, null, this);
+        this.physics.add.overlap(ship, enemies, damage, null, this);
+    }
 
     spawnId++;
     if (spawnId % 2 == 0) arrayJunk.push(enemies);
@@ -171,9 +150,27 @@ function spawn(position,minVelocity, maxVelocity) {
 }
 
 let lastUpdateTime = 0;
+let lastUpdateTimeStars = 0;
+let score = 0;
+let hp = 3;
+
+function scoring (player, junk)
+{
+    score++;
+    junk.disableBody(true, true);
+}
+
+
+function damage (ship, junk) {
+    hp--;
+    console.log("HP: "+hp);
+    ship.disableBody(true, true);
+    junk.disableBody(true, true);
+}
 
 function update() {
 
+    this.text.setText("SCORE: " + score);
     // ================ CONTROLS ============================================
     if (cursors.down.isDown)
     {
@@ -195,6 +192,8 @@ function update() {
         player.anims.play('turn');
     }
 
+    // ================ JUNK ==========================
+
     arrayJunk.forEach(enemy => {
         enemy.children.iterate(child => {
             child.angle++;
@@ -207,8 +206,13 @@ function update() {
         });
     });
 
-    if (lastUpdateTime < Date.now() - 3000) {
-        spawn.bind(this, 900, -10, -30)();
+    if (lastUpdateTime < Date.now() - 4000) {
+        spawn.bind(this, width+100, -10, -1000, 'lixo', true)();
         lastUpdateTime = Date.now();
+    }
+
+    if (lastUpdateTimeStars < Date.now() - 50) {
+        spawn.bind(this, width+100, -100, -200, 'star', false)();
+        lastUpdateTimeStars = Date.now();
     }
 }

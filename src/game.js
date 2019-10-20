@@ -1,5 +1,6 @@
 let self = null;
 let score = 0;
+updateTopTen();
 var SceneA = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -119,11 +120,29 @@ class SceneC extends Phaser.Scene {
             }
         });
         graphics.fillRectShape(rect);
-
-        let gameover = this.add.bitmapText(width/2, height/2-100, 'carrier_command','Game Over!', 44).setOrigin(0.5);
-        let scoreGO = this.add.bitmapText(width/2, height/2, 'carrier_command','Your score: ' + score, 24).setOrigin(0.5);
-        let restart = this.add.bitmapText(width/2, height/2+50, 'carrier_command','tap to restart', 14).setOrigin(0.5);
+        let offY = -100;
+        this.add.bitmapText(width/2, height/2-100+offY, 'carrier_command','Game Over!', 44).setOrigin(0.5);
+        this.add.bitmapText(width/2, height/2+offY, 'carrier_command','Your score: ' + score, 24).setOrigin(0.5);
+        this.add.bitmapText(width/2, height/2+50+offY, 'carrier_command','tap to restart', 14).setOrigin(0.5);
+        this.add.bitmapText(width/2, height/2+150+offY, 'carrier_command','TOP PLAYERS', 15).setOrigin(0.5);
+        var person = prompt("Please enter your name", sessionStorage.getItem('name') || '');
         
+        if (person != null) {
+            let sc = new Score(person, score);
+            sc.upload();
+            let me;
+            if ((me = topTenScores.find(p => p.name.toLowerCase() == person.toLowerCase()))) {
+                me.score = score;
+            } else {
+                topTenScores.push(sc);
+            }
+            
+        }
+        sortTopTen();
+        let i = 1;
+        for (let person of topTenScores) {
+            this.add.bitmapText(width/2, height/2+160+offY+i*25, 'carrier_command',`${i++} ${person.name}: ${person.score}`, 10).setOrigin(0.5);
+        }
     }
 }
 
@@ -151,10 +170,7 @@ let config = {
     // }
 };
 
-let {width, height} = {width: 0, height: 0};
-
 let game = new Phaser.Game(config);
-
 let junkMinVelocity = -500;
 let junkMaxVelocity = -800;
 
@@ -232,6 +248,9 @@ function keyLoseLife(e) {
 
         if (hp > 0) {
             hp--;
+
+        game.scene.run('GameOver')
+        togglePause();
         }
         console.log("HP restante: ",hp);
         console.log("life lost: ",life.getChildren());
@@ -265,7 +284,6 @@ function create ()
      width = self.sys.game.canvas.width;
      height = self.sys.game.canvas.height;
 
-     
     // ================ SCENARIO ============================================
     self.physics.world.setBounds(-200, 0, width+350, height, true, true, true, true);
 
@@ -276,10 +294,10 @@ function create ()
     // ================ CREATE STARFIELD ======================
     // createStarfield.bind(this)();
 
-    ship = self.physics.add.staticGroup();
+    ship = self.physics.add.sprite(100, 300, 'nave');
 
-    ship.create(100, 300, 'nave').setScale(1).refreshBody();
-
+    ship.setScale(1);
+    ship.dir = 1;
     // ================ PLAYER ============================================
 
 
@@ -324,7 +342,7 @@ function create ()
         repeat: -1
     });
 
-    player = self.physics.add.sprite(200, 300, 'rede2');
+    player = self.physics.add.sprite(230, 300, 'rede2');
 
     player.setBounce(0);
     player.setCollideWorldBounds(true);
@@ -416,18 +434,12 @@ function scoring (player, junk)
     }
 
     if (altitude == 5000) {    
-        ship.clear(true);
-        ship = self.physics.add.staticGroup();
-        ship.create(100, 300, 'nave2').setScale(1).refreshBody();
+        ship.setTexture('nave2');
         altitudeOld = altitude;
     }
 
-    if (altitude == 10000) {    
-        ship.clear(true);
-        ship = self.physics.add.staticGroup();
-        ship.create(150, 300, 'nave3').setScale(1).refreshBody();
-        console.log("player: ",player);
-        player.x = player.x+150;
+    if (altitude == 10000) {  
+        ship.setTexture('nave3');
         altitudeOld = altitude;
     }
 
@@ -451,7 +463,7 @@ function damage (ship, junk) {
     junk.disableBody(true, true);
     if (hp <= 0) {
         ship.disableBody(true, true);
-        game.scene.run('GameOver')
+        game.scene.run('GameOver');
         togglePause();
     }
 }
@@ -512,5 +524,11 @@ function update() {
     if (lastUpdateTimeStars < Date.now() - 1000) {
         spawn.bind(this, width+100, -10, -500, 'star', false)();
         lastUpdateTimeStars = Date.now();
+    }
+    
+    ship.setVelocityY(ship.dir == 1 ? 50 : -50);
+
+    if (ship.y > height - ship.height / 2 && ship.dir == 1 || ship.y < ship.height / 2 && ship.dir == -1){
+        ship.dir = ship.dir == 1 ? -1 : 1;
     }
 }

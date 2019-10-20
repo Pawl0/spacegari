@@ -433,8 +433,9 @@ function create ()
     self.text = self.add.text(40, 20, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
     self.textAltitude = self.add.text(40, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
     self.textLife = self.add.text(55, 45, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
-    self.textDebris = self.add.text(width-250, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
+    self.textDebris = self.add.text(width-320, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
 
+    self.textDebris.setText("Debris near your altitude: 1017");
     setTimeout(() => {
         togglePause();
 
@@ -520,18 +521,18 @@ function scoring (player, junk)
     console.log(altitude);
 
     switch(altitude) {
-        case 500 : self.textDebris.setText("Debris quantity: 1017");
+        case 500 : self.textDebris.setText("Debris near your altitude: 1017");
                    break;
-        case 1000 : self.textDebris.setText("Debris quantity: 8557");
+        case 1000 : self.textDebris.setText("Debris near your altitude: 8557");
                    break;
-        case 2000 : self.textDebris.setText("Debris quantity: 1650");
+        case 2000 : self.textDebris.setText("Debris near your altitude: 1650");
                    break;
-        case 3000 : self.textDebris.setText("Debris quantity: 54");
+        case 3000 : self.textDebris.setText("Debris near your altitude: 54");
                    break;
-        case 5000 : self.textDebris.setText("Debris quantity: 107");
+        case 5000 : self.textDebris.setText("Debris near your altitude: 107");
                    break;
         case 10000 :
-        default:    self.textDebris.setText("Debris quantity: 370");
+        default:    self.textDebris.setText("Debris near your altitude: 370");
                    break;
     }
     

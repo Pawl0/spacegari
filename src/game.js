@@ -22,7 +22,7 @@ let textsToShow = [
     ]
 ];
 
-let textTitle = "Mission Complete!"
+let textTitle = "Let's go!"
 let textToShow = 0;
 
 var SceneA = new Phaser.Class({

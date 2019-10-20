@@ -1,4 +1,5 @@
 let self = null;
+let score = 0;
 var SceneA = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -11,13 +12,29 @@ var SceneA = new Phaser.Class({
 
     preload: function ()
     {
-        this.load.image('title', 'assets/space_gari.jpeg');
+        this.load.bitmapFont('carrier_command', 'assets/fonts/carrier_command.png', 'assets/fonts/carrier_command.xml');
+        this.load.image('bg', 'assets/bg-intro.png');
+        this.load.image('terra4', 'assets/terra-camada4.png');
+        this.load.image('terra3', 'assets/terra-camada3.png');
+        this.load.image('terra2', 'assets/terra-camada2.png');
+        this.load.image('terra1', 'assets/terra-camada1.png');
+        this.load.image('terra', 'assets/terrinha.png');
+        this.load.image('name', 'assets/SPACEGARI-TITLE.png');
+        this.load.image('gari','assets/astrogari.png');
+        this.load.image('button', 'assets/playbutton.png');
     },
 
     create: function ()
     {
-        background = this.physics.add.staticGroup();
-        background.create(window.innerWidth/2, window.innerHeight/2, 'title').setScale(4).refreshBody();
+        face = this.add.image(window.innerWidth/2,window.innerHeight/2, 'bg');
+        terra4 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra4');;
+        terra3 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra3');;
+        terra2 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra2');;
+        terra1 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra1');;
+        terra = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra');
+        name = this.add.image(window.innerWidth/2, window.innerHeight/4, 'name');
+        gari = this.add.image(window.innerWidth/4, window.innerHeight/1.5, 'gari');
+        button = this.add.image(window.innerWidth/1.5, window.innerHeight/1.5, 'button');
         
 
         this.input.once('pointerdown', function () {
@@ -27,9 +44,22 @@ var SceneA = new Phaser.Class({
             this.scene.start('game');
 
         }, this);
-    }
+    },
+    // extend: {
+    //     face = null,
+    //     terra = null,
+    //     name = null,
+    //     gari = null,
+    //     button = null,
+    //     terra1 = null,
+    //     terra2 = null,
+    //     terra3 = null,
+    //     terra4 = null
+    // }
 
 });
+
+let nave = 1;
 
 var SceneB = new Phaser.Class({
 
@@ -66,6 +96,37 @@ var SceneB = new Phaser.Class({
 
 });
 
+
+class SceneC extends Phaser.Scene {
+
+    constructor ()
+    {
+        super({ key: 'GameOver' });
+
+        this.score = 0;
+    }
+
+    create ()
+    {
+        let {width, height} = self.sys.game.canvas;
+        let rect = new Phaser.Geom.Rectangle(0, 0, width, height);
+
+        let graphics = this.add.graphics({ fillStyle: { color: 0x0000ff55 } });
+        graphics.setDefaultStyles({
+            fillStyle: {
+                color: 0x000000,
+                alpha: 0.5
+            }
+        });
+        graphics.fillRectShape(rect);
+
+        let gameover = this.add.bitmapText(width/2, height/2-100, 'carrier_command','Game Over!', 44).setOrigin(0.5);
+        let scoreGO = this.add.bitmapText(width/2, height/2, 'carrier_command','Your score: ' + score, 24).setOrigin(0.5);
+        let restart = this.add.bitmapText(width/2, height/2+50, 'carrier_command','tap to restart', 14).setOrigin(0.5);
+        
+    }
+}
+
 let config = {
     type: Phaser.AUTO,
     width: window.innerWidth * window.devicePixelRatio, 
@@ -77,7 +138,7 @@ let config = {
             debug: false
         }
     },
-    scene: [SceneA, SceneB]
+    scene: [SceneA, SceneB, SceneC]
     // {
     //     preload: preload,
     //     create: create,
@@ -107,17 +168,22 @@ function preload ()
     self.load.image('nave2', 'assets/nave_2.png');
     self.load.image('nave3', 'assets/nave_3.png');
     self.load.image('lixo', 'assets/lixo.png');
+    self.load.image('lixo2', 'assets/lixo02.png');
     self.load.image('lixo_antena', 'assets/lixo_antena.png');
     self.load.image('lixo_pedaco', 'assets/lixo_pedaco.png');
     self.load.image('lixo_motor_foguete', 'assets/lixo_motor_foguete.png');
     self.load.image('star', 'assets/star2.png');
     self.load.image('vida', 'assets/vida.png');
-    self.load.spritesheet('rede', 
+    self.load.spritesheet('rede1', 
         'assets/spritesheet.png',
         { frameWidth: 160, frameHeight: 220 }
     );
+    self.load.spritesheet('rede2', 
+        'assets/rede02.png',
+        { frameWidth: 160, frameHeight: 220 }
+    );
 }
-let junkType = ['lixo', 'lixo_pedaco', 'lixo_antena', 'lixo_motor_foguete'];
+let junkType = ['lixo', 'lixo_pedaco', 'lixo_antena', 'lixo_motor_foguete', 'lixo2'];
 let angle = 0;
 function createStarfield ()
 {
@@ -164,7 +230,7 @@ function keyLoseLife(e) {
     key = e.code;
     if (key == 'KeyL') {
 
-        if (hp > -1) {
+        if (hp > 0) {
             hp--;
         }
         console.log("HP restante: ",hp);
@@ -200,8 +266,10 @@ function create ()
      height = self.sys.game.canvas.height;
 
      
-    self.physics.world.setBounds(-200, 0, width+350, height, true, true, true, true);
     // ================ SCENARIO ============================================
+    self.physics.world.setBounds(-200, 0, width+350, height, true, true, true, true);
+
+    // ================ LIVES ==============================================
     life = self.physics.add.staticGroup();
     life.create(20, 45, 'vida').setScale(0.025).refreshBody();
 
@@ -214,7 +282,49 @@ function create ()
 
     // ================ PLAYER ============================================
 
-    player = self.physics.add.sprite(200, 300, 'rede');
+
+    // ================ PLAYER ANIMATION ============================================
+    self.anims.create({
+        key: 'up1',
+        frames: self.anims.generateFrameNumbers('rede1', { start: 0, end: 2 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    self.anims.create({
+        key: 'up2',
+        frames: self.anims.generateFrameNumbers('rede2', { start: 0, end: 2 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    self.anims.create({
+        key: 'turn1',
+        frames: [ { key: 'rede1', frame: 3 } ],
+        frameRate: 20
+    });
+
+    self.anims.create({
+        key: 'turn2',
+        frames: [ { key: 'rede2', frame: 3 } ],
+        frameRate: 20
+    });
+
+    self.anims.create({
+        key: 'down1',
+        frames: self.anims.generateFrameNumbers('rede1', { start: 4, end: 6 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    self.anims.create({
+        key: 'down2',
+        frames: self.anims.generateFrameNumbers('rede2', { start: 4, end: 6 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    player = self.physics.add.sprite(200, 300, 'rede2');
 
     player.setBounce(0);
     player.setCollideWorldBounds(true);
@@ -222,30 +332,8 @@ function create ()
     player.angle = 0;
     player.setScale(0.5);
 
-
-    // ================ PLAYER ANIMATION ============================================
-    self.anims.create({
-        key: 'up',
-        frames: self.anims.generateFrameNumbers('rede', { start: 0, end: 2 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-    self.anims.create({
-        key: 'turn',
-        frames: [ { key: 'rede', frame: 3 } ],
-        frameRate: 20
-    });
-
-    self.anims.create({
-        key: 'down',
-        frames: self.anims.generateFrameNumbers('rede', { start: 4, end: 6 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
     // ================ COLLISION ============================================
-    self.physics.add.collider(player, ship);
+    // self.physics.add.collider(player, ship);
 
     // ================ CONTROLS ============================================
     cursors = self.input.keyboard.createCursorKeys();
@@ -312,7 +400,6 @@ function spawn(position,minVelocity, maxVelocity, key, collision) {
 let lastUpdateTime = 0;
 let lastUpdateTimeStars = 0;
 let lastUpdateTimePause = 0;
-let score = 0;
 let altitude = 500;
 let hp = 3;
 let scoreOld = score;
@@ -348,6 +435,12 @@ function scoring (player, junk)
         scoreLife = score;
         hp++;
     }
+
+    if (score == 1) {
+        nave = 2;
+        player.setScale(1);
+    }
+
     if (junk) junk.disableBody(true, true);
 }
 
@@ -356,8 +449,14 @@ function damage (ship, junk) {
     hp--;
     self.sound.play('colisao1', { loop: false });
     junk.disableBody(true, true);
-    if (hp < 0) ship.disableBody(true, true);
+    if (hp <= 0) {
+        ship.disableBody(true, true);
+        game.scene.run('GameOver')
+        togglePause();
+    }
 }
+
+
 
 function update() {
     self.text.setText("SCORE: " + score);
@@ -368,7 +467,7 @@ function update() {
     {
         player.setAccelerationY(300);
 
-        player.anims.play('down', true);
+        player.anims.play('down'+nave, true);
 
         if (!sounds.movimento.isPlaying)
             sounds.movimento.play();
@@ -377,7 +476,7 @@ function update() {
     {
         player.setAccelerationY(-300);
 
-        player.anims.play('up', true);
+        player.anims.play('up'+nave, true);
 
         if (!sounds.movimento.isPlaying)
         sounds.movimento.play();
@@ -388,7 +487,7 @@ function update() {
         player.setAccelerationY(0);
         player.setVelocityY(player.body.velocity.y + (player.body.velocity.y > 0 ? -1 : 1));
 
-        player.anims.play('turn');
+        player.anims.play('turn'+nave);
     }
     // ================ JUNK ==========================
 
@@ -405,7 +504,7 @@ function update() {
     });
 
     if (lastUpdateTime < Date.now() - 2000) {
-        let junkindex = Phaser.Math.FloatBetween(0, 3);
+        let junkindex = Phaser.Math.FloatBetween(0, 4);
         spawn.bind(this, width+100, junkMinVelocity, junkMaxVelocity, junkType[junkindex.toFixed(0)], 'lixo', true)();
         lastUpdateTime = Date.now();
     }

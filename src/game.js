@@ -2,6 +2,29 @@ let self = null;
 let score = 0;
 updateTopTen();
 
+
+let textsToShow = [
+    [
+        "Congratulations for being chosen to be a Space Cleaner!",
+        "Your mission is to protect NASA's SkyLab from all the dangerous",
+        "space junk that's floating around due to some people not being very careful..."
+    ],
+    [
+        "You have successfully protected SkyLab!",
+        "Now, you have been assigned to protect the International Space Station!",
+        "The space junk can mess up all the cool experiments they are doing in there!"
+    ],
+    [
+        "What a great work protecting ISS!",
+        "Now, you have a very special mission!",
+        "You will be the Interplanetary Gateway's guardian.",
+        "The humanity's future can be changed by that spaceship."
+    ]
+];
+
+let textTitle = "Mission Complete!"
+let textToShow = 0;
+
 var SceneA = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -166,6 +189,45 @@ class SceneC extends Phaser.Scene {
     }
 }
 
+class SceneD extends Phaser.Scene {
+
+    constructor ()
+    {
+        super({ key: 'Text' });
+    }
+
+    create ()
+    {
+        let {width, height} = self.sys.game.canvas;
+        let rect = new Phaser.Geom.Rectangle(0, 0, width, height);
+
+        this.cameras.main.setBackgroundColor('rgb(0,0,85)');
+        face = this.add.image(window.innerWidth/2,window.innerHeight/2, 'bg');
+        face.setScale(1.5);
+
+        let offY = -100;
+        this.add.bitmapText(width/2, height/2-100+offY, 'carrier_command',textTitle, 44).setOrigin(0.5);
+        this.add.image(window.innerWidth/6, window.innerHeight/1.3, 'gari');
+        let i = 1;
+        for (let text of textsToShow[textToShow]) {
+            this.add.bitmapText(width/2, height/2+offY+i*25, 'carrier_command',text, 10).setOrigin(0.5);
+            i++;
+        }
+
+        this.add.bitmapText(width/2, height/2+offY+20+i*25, 'carrier_command',"Click to resume", 8).setOrigin(0.5);
+
+        this.input.once('pointerdown', function () {
+
+            console.log('From SceneC to SceneB');
+
+            this.scene.stop('Text');
+            togglePause();
+
+
+        }, this);
+    }
+}
+
 let config = {
     type: Phaser.AUTO,
     width: window.innerWidth * window.devicePixelRatio, 
@@ -177,7 +239,7 @@ let config = {
             debug: false
         }
     },
-    scene: [SceneA, SceneB, SceneC]
+    scene: [SceneA, SceneB, SceneC, SceneD]
 };
 
 let game = new Phaser.Game(config);
@@ -371,6 +433,11 @@ function create ()
     self.textAltitude = self.add.text(40, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
     self.textLife = self.add.text(55, 45, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
 
+    setTimeout(() => {
+        togglePause();
+
+    }, 200);
+    game.scene.run('Text');
 }
 
 
@@ -462,6 +529,13 @@ function scoring (player, junk)
     if (altitude == shipChangeScore) {    
         ship.setTexture('nave2');
         altitudeOld = altitude;
+        textToShow = 1;
+        textTitle = "Mission Complete!"
+        setTimeout(() => {
+            togglePause();
+
+        }, 200);
+        game.scene.run('Text');
     }
 
     if (altitude == 2*shipChangeScore) {  
@@ -469,6 +543,13 @@ function scoring (player, junk)
         ship.x = 0;
 
         altitudeOld = altitude;
+        textToShow = 2;
+        textTitle = "Mission Complete!"
+        setTimeout(() => {
+            togglePause();
+
+        }, 200);
+        game.scene.run('Text');
     }
 
     if (score-scoreLife == lifeUpScore) {

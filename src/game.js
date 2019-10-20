@@ -27,6 +27,7 @@ var SceneA = new Phaser.Class({
 
     create: function ()
     {
+        this.cameras.main.setBackgroundColor('rgb(0,0,85)');
         face = this.add.image(window.innerWidth/2,window.innerHeight/2, 'bg');
         terra4 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra4');;
         terra3 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra3');;

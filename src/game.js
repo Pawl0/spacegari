@@ -125,7 +125,8 @@ var SceneB = new Phaser.Class({
     extend: {
             text: null,
             textAltitude: null,
-            textLife: null
+            textLife: null,
+            textDebris: null
     }
 
 });
@@ -432,6 +433,7 @@ function create ()
     self.text = self.add.text(40, 20, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
     self.textAltitude = self.add.text(40, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
     self.textLife = self.add.text(55, 45, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
+    self.textDebris = self.add.text(width-250, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
 
     setTimeout(() => {
         togglePause();
@@ -514,6 +516,24 @@ let starsMaxVelocity = -500;
 function scoring (player, junk)
 {
     score++;
+
+    console.log(altitude);
+
+    switch(altitude) {
+        case 500 : self.textDebris.setText("Debris quantity: 1017");
+                   break;
+        case 1000 : self.textDebris.setText("Debris quantity: 8557");
+                   break;
+        case 2000 : self.textDebris.setText("Debris quantity: 1650");
+                   break;
+        case 3000 : self.textDebris.setText("Debris quantity: 54");
+                   break;
+        case 5000 : self.textDebris.setText("Debris quantity: 107");
+                   break;
+        case 10000 :
+        default:    self.textDebris.setText("Debris quantity: 370");
+                   break;
+    }
     
     if (score-scoreOld == altitudeChangeScore) {
         scoreOld = score;

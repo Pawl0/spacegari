@@ -13,7 +13,7 @@ var SceneA = new Phaser.Class({
 
     preload: function ()
     {
-        this.load.bitmapFont('carrier_command', 'assets/fonts/carrier_command.png', 'assets/fonts/carrier_command.xml');
+        this.load.bitmapFont('carrier_command', 'assets/fonts/carrier_command_yellow.png', 'assets/fonts/carrier_command.xml');
         this.load.image('bg', 'assets/bg-intro.png');
         this.load.image('terra4', 'assets/terra-camada4.png');
         this.load.image('terra3', 'assets/terra-camada3.png');
@@ -46,18 +46,7 @@ var SceneA = new Phaser.Class({
             this.scene.start('game');
 
         }, this);
-    },
-    // extend: {
-    //     face = null,
-    //     terra = null,
-    //     name = null,
-    //     gari = null,
-    //     button = null,
-    //     terra1 = null,
-    //     terra2 = null,
-    //     terra3 = null,
-    //     terra4 = null
-    // }
+    }
 
 });
 
@@ -159,23 +148,10 @@ let config = {
         }
     },
     scene: [SceneA, SceneB, SceneC]
-    // {
-    //     preload: preload,
-    //     create: create,
-    //     update: update,
-    //     extend: {
-    //         text: null,
-    //         textAltitude: null,
-    //         textLife: null
-    //     }
-    // }
 };
 
 let game = new Phaser.Game(config);
-let junkMinVelocity = -500;
-let junkMaxVelocity = -800;
 
-// let arrayLife = [];
 function preload ()
 {
     self.load.audio('level1sound', 'assets/sounds/background/1level1.mp3');
@@ -192,7 +168,7 @@ function preload ()
     self.load.image('star', 'assets/star2.png');
     self.load.image('vida', 'assets/vida.png');
     self.load.spritesheet('rede1', 
-        'assets/spritesheet.png',
+        'assets/spritesheet_old.png',
         { frameWidth: 160, frameHeight: 220 }
     );
     self.load.spritesheet('rede2', 
@@ -202,6 +178,8 @@ function preload ()
 }
 let junkType = ['lixo', 'lixo_pedaco', 'lixo_antena', 'lixo_motor_foguete', 'lixo2'];
 let angle = 0;
+
+// Deprecated
 function createStarfield ()
 {
 
@@ -278,6 +256,7 @@ function keyPause(e) {
 
 function create ()
 {
+    self.cameras.main.setBackgroundColor('rgb(20,0,35)');
     sounds.level1 = game.sound.add('level1sound');
     sounds.movimento = game.sound.add('movimento');
     sounds.colisao1 = game.sound.add('colisao1');
@@ -290,12 +269,12 @@ function create ()
 
     // ================ LIVES ==============================================
     life = self.physics.add.staticGroup();
-    life.create(20, 45, 'vida').setScale(0.025).refreshBody();
+    life.create(50, 50, 'vida').setScale(0.15).refreshBody();
 
     // ================ CREATE STARFIELD ======================
     // createStarfield.bind(this)();
 
-    ship = self.physics.add.sprite(100, 300, 'nave');
+    ship = self.physics.add.sprite(85, 300, 'nave');
 
     ship.setScale(1);
     ship.dir = 1;
@@ -349,7 +328,7 @@ function create ()
     player.setCollideWorldBounds(true);
     player.setMaxVelocity(1000);
     player.angle = 0;
-    player.setScale(0.5);
+    player.setScale(0.35);
 
     // ================ COLLISION ============================================
     // self.physics.add.collider(player, ship);
@@ -358,9 +337,9 @@ function create ()
     cursors = self.input.keyboard.createCursorKeys();
 
     // ================ SCORE =========================
-    self.text = self.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' }).setDepth(1).setScrollFactor(0);
-    self.textAltitude = self.add.text(10, height-20, '', { font: '16px Courier', fill: '#00ff00' }).setDepth(1).setScrollFactor(0);
-    self.textLife = self.add.text(20, 40, '', { font: '16px Courier', fill: '#00ff00' }).setDepth(1).setScrollFactor(0);
+    self.text = self.add.text(40, 20, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
+    self.textAltitude = self.add.text(40, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
+    self.textLife = self.add.text(55, 45, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
 
 }
 
@@ -380,7 +359,7 @@ function spawn(position,minVelocity, maxVelocity, key, collision) {
     
     enemies.children.iterate(function (child) {
 
-        child.setScale(0.5);
+        child.setScale(0.3);
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         child.velX = Phaser.Math.FloatBetween(minVelocity, maxVelocity);
         child.setVelocityX(child.velX);
@@ -424,34 +403,52 @@ let hp = 3;
 let scoreOld = score;
 let scoreLife = score;
 let altitudeOld = altitude;
+let shipChangeScore = 5000;
+let altitudeChangeScore = 1;
+let lifeUpScore = 20;
+let altitudeIncrement = 500;
+let spawnRate = 1000;
+let starRate = 100;
+let junkMinVelocity = -500;
+let junkMaxVelocity = -800;
+let starsMinVelocity = -30;
+let starsMaxVelocity = -500;
 
 function scoring (player, junk)
 {
     score++;
     
-    if (score-scoreOld == 1) {
+    if (score-scoreOld == altitudeChangeScore) {
         scoreOld = score;
-        altitude += 500;
+        altitude += altitudeIncrement;
+        junkMinVelocity -=50;
+        junkMaxVelocity -=50;
+        starRate += 500;
+        spawnRate += 200;
+        starsMinVelocity += -50;
+        starsMaxVelocity += -50;
     }
 
-    if (altitude == 5000) {    
+    if (altitude == shipChangeScore) {    
         ship.setTexture('nave2');
         altitudeOld = altitude;
     }
 
-    if (altitude == 10000) {  
+    if (altitude == 2*shipChangeScore) {  
         ship.setTexture('nave3');
+        ship.x = 0;
+
         altitudeOld = altitude;
     }
 
-    if (score-scoreLife == 5) {
+    if (score-scoreLife == lifeUpScore) {
         scoreLife = score;
         hp++;
     }
 
-    if (score == 1) {
+    if (score == 20) {
         nave = 2;
-        player.setScale(1);
+        player.setScale(0.75);
     }
 
     if (junk) junk.disableBody(true, true);
@@ -478,7 +475,7 @@ function update() {
     // ================ CONTROLS ============================================
     if (cursors.down.isDown)
     {
-        player.setAccelerationY(300);
+        player.setAccelerationY(400);
 
         player.anims.play('down'+nave, true);
 
@@ -487,7 +484,7 @@ function update() {
     }
     else if (cursors.up.isDown)
     {
-        player.setAccelerationY(-300);
+        player.setAccelerationY(-400);
 
         player.anims.play('up'+nave, true);
 
@@ -516,14 +513,14 @@ function update() {
         });
     });
 
-    if (lastUpdateTime < Date.now() - 2000) {
+    if (lastUpdateTime < Date.now() - spawnRate) {
         let junkindex = Phaser.Math.FloatBetween(0, 4);
         spawn.bind(this, width+100, junkMinVelocity, junkMaxVelocity, junkType[junkindex.toFixed(0)], 'lixo', true)();
         lastUpdateTime = Date.now();
     }
 
-    if (lastUpdateTimeStars < Date.now() - 1000) {
-        spawn.bind(this, width+100, -10, -500, 'star', false)();
+    if (lastUpdateTimeStars < Date.now() - starRate) {
+        spawn.bind(this, width+100, starsMinVelocity, starsMaxVelocity, 'star', false)();
         lastUpdateTimeStars = Date.now();
     }
     

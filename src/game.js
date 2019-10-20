@@ -1,6 +1,7 @@
 let self = null;
 let score = 0;
 updateTopTen();
+
 var SceneA = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -14,13 +15,14 @@ var SceneA = new Phaser.Class({
     preload: function ()
     {
         this.load.bitmapFont('carrier_command', 'assets/fonts/carrier_command_yellow.png', 'assets/fonts/carrier_command.xml');
-        this.load.image('bg', 'assets/bg-intro.png');
+        this.load.image('bg', 'assets/bg720-intro.png');
         this.load.image('terra4', 'assets/terra-camada4.png');
         this.load.image('terra3', 'assets/terra-camada3.png');
         this.load.image('terra2', 'assets/terra-camada2.png');
         this.load.image('terra1', 'assets/terra-camada1.png');
         this.load.image('terra', 'assets/terrinha.png');
         this.load.image('name', 'assets/SPACEGARI-TITLE.png');
+        this.load.image('bg_stars', 'assets/bg-estrelas.png');
         this.load.image('gari','assets/astrogari.png');
         this.load.image('button', 'assets/playbutton.png');
     },
@@ -29,23 +31,41 @@ var SceneA = new Phaser.Class({
     {
         this.cameras.main.setBackgroundColor('rgb(0,0,85)');
         face = this.add.image(window.innerWidth/2,window.innerHeight/2, 'bg');
-        terra4 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra4');;
-        terra3 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra3');;
-        terra2 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra2');;
-        terra1 = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra1');;
-        terra = this.add.image(window.innerWidth/2,window.innerHeight/2, 'terra');
-        name = this.add.image(window.innerWidth/2, window.innerHeight/4, 'name');
+        face.setScale(1.5);
+        bg_stars = this.add.image(window.innerWidth/2, window.innerHeight/4, 'bg_stars');
+        bg_stars.setScale(1);
+        terra4 = this.add.image(window.innerWidth/2,window.innerHeight/1.5, 'terra4');
+        terra4.setScale(0.5);
+        terra3 = this.add.image(window.innerWidth/2,window.innerHeight/1.5, 'terra3');
+        terra3.setScale(0.5);
+        terra2 = this.add.image(window.innerWidth/2,window.innerHeight/1.5, 'terra2');
+        terra2.setScale(0.5);
+        terra1 = this.add.image(window.innerWidth/2,window.innerHeight/1.5, 'terra1');
+        terra1.setScale(0.5);
+        terra = this.add.image(window.innerWidth/2,window.innerHeight/1.5, 'terra');
+        terra.setScale(0.5);
+        namevariable = this.add.image(window.innerWidth/2, window.innerHeight/4, 'name');
+        namevariable.setScale(0.75);
         gari = this.add.image(window.innerWidth/4, window.innerHeight/1.5, 'gari');
-        button = this.add.image(window.innerWidth/1.5, window.innerHeight/1.5, 'button');
-        
-
-        this.input.once('pointerdown', function () {
+        button = this.add.image(window.innerWidth/1.3, window.innerHeight/1.5, 'button');
+        button.setScale(0.8);
+        button.setDepth(1);
+        button.setInteractive();
+        button.on('pointerdown', function () {
 
             console.log('From SceneA to SceneB');
 
             this.scene.start('game');
 
         }, this);
+
+        // this.input.once('pointerdown', function () {
+
+        //     console.log('From SceneA to SceneB');
+
+        //     this.scene.start('game');
+
+        // }, this);
     }
 
 });
@@ -113,7 +133,7 @@ class SceneC extends Phaser.Scene {
         let offY = -100;
         this.add.bitmapText(width/2, height/2-100+offY, 'carrier_command','Game Over!', 44).setOrigin(0.5);
         this.add.bitmapText(width/2, height/2+offY, 'carrier_command','Your score: ' + score, 24).setOrigin(0.5);
-        this.add.bitmapText(width/2, height/2+50+offY, 'carrier_command','tap to restart', 14).setOrigin(0.5);
+        this.add.bitmapText(width/2, height/2+50+offY, 'carrier_command','Press F5 to restart', 14).setOrigin(0.5);
         this.add.bitmapText(width/2, height/2+150+offY, 'carrier_command','TOP PLAYERS', 15).setOrigin(0.5);
         var person = prompt("Please enter your name", sessionStorage.getItem('name') || '');
         
@@ -133,6 +153,16 @@ class SceneC extends Phaser.Scene {
         for (let person of topTenScores) {
             this.add.bitmapText(width/2, height/2+160+offY+i*25, 'carrier_command',`${i++} ${person.name}: ${person.score}`, 10).setOrigin(0.5);
         }
+        
+        this.input.once('pointerdown', function () {
+
+            console.log('From SceneC to SceneB');
+
+            this.scene.stop('GameOver');
+            window.location.reload();
+
+
+        }, this);
     }
 }
 
@@ -168,7 +198,7 @@ function preload ()
     self.load.image('star', 'assets/star2.png');
     self.load.image('vida', 'assets/vida.png');
     self.load.spritesheet('rede1', 
-        'assets/spritesheet_old.png',
+        'assets/spritesheet.png',
         { frameWidth: 160, frameHeight: 220 }
     );
     self.load.spritesheet('rede2', 

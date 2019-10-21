@@ -7,8 +7,8 @@ let textsToShow = [
     [
         "Congratulations for being chosen to be a Space Cleaner!",
         "Your mission is to protect NASA's SkyLab from all the dangerous",
-        "space junk that's floating around due to some people not being very careful..."
-        ""
+        "space junk that's floating around due to some people not being very careful...",
+        "",
         "You can use the Up and Down Arrow Keys to move the Protective Net arround."
     ],
     [

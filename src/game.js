@@ -71,7 +71,7 @@ var SceneA = new Phaser.Class({
         namevariable.setScale(0.75);
         gari = this.add.image(window.innerWidth/4, window.innerHeight/1.5, 'gari');
         button = this.add.image(window.innerWidth/1.3, window.innerHeight/1.5, 'button');
-        button.setScale(0.8);
+        button.setScale(0.4);
         button.setDepth(1);
         button.setInteractive();
         button.on('pointerdown', function () {

@@ -166,16 +166,18 @@ class SceneC extends Phaser.Scene {
         if (person != null && score > 0) {
             let sc = new Score(person, score);
             sc.upload();
+            /*
             let me;
             if ((me = topTenScores.find(p => p.name.toLowerCase() == person.toLowerCase()))) {
                 me.score = score;
             } else {
                 topTenScores.push(sc);
-            }
+            }*/
             
         }
-        sortTopTen();
+        //sortTopTen();
         let i = 1;
+        topTenScores.pop(); //when counting, from 1 to 10, you only need 9 items
         for (let person of topTenScores) {
             this.add.bitmapText(width/2, height/2+160+offY+i*25, 'carrier_command',`${i++} ${person.name}: ${person.score}`, 10).setOrigin(0.5);
         }

@@ -316,6 +316,30 @@ document.addEventListener('keydown', keyPause);
 
 document.addEventListener('keydown', keyLoseLife);
 
+document.addEventListener('keydown', updateWSDown);
+
+document.addEventListener('keyup', updateWSUp);
+
+function updateWSDown(e){
+    key = e.code;
+    if (key == 'KeyW'){
+        isWDown = true;
+    }
+    if (key == 'KeyS'){
+        isSDown = true;
+    }
+}
+
+function updateWSUp(e){
+    key = e.code;
+    if (key == 'KeyW'){
+        isWDown = false;
+    }
+    if (key == 'KeyS'){
+        isSDown = false;
+    }
+}
+
 function keyLoseLife(e) {
     key = e.code;
     if (key == 'KeyL') {
@@ -332,14 +356,16 @@ function keyLoseLife(e) {
   //   console.log(key);
   }
 
-document.addEventListener('keydown', keyIncScore);
+//document.addEventListener('keydown', keyIncScore);
+
+/*
 function keyIncScore(e) {
     key = e.code;
     if (key == 'KeyS') {
         scoring(player,null);
         console.log("score: ",score);
     }
-  }
+  } */
 
 let key = null;
 function keyPause(e) {
@@ -515,6 +541,8 @@ let junkMinVelocity = -500;
 let junkMaxVelocity = -800;
 let starsMinVelocity = -30;
 let starsMaxVelocity = -500;
+let isWDown = false;
+let isSDown = false;
 
 function scoring (player, junk)
 {
@@ -601,13 +629,12 @@ function damage (ship, junk) {
 }
 
 
-
 function update() {
     self.text.setText("SCORE: " + score);
     self.textAltitude.setText("ALTITUDE: " + altitude + "KM");
     self.textLife.setText(" x"+hp);
     // ================ CONTROLS ============================================
-    if (cursors.down.isDown)
+    if (cursors.down.isDown || isSDown)
     {
         player.setAccelerationY(400);
 
@@ -616,7 +643,7 @@ function update() {
         if (!sounds.movimento.isPlaying)
             sounds.movimento.play();
     }
-    else if (cursors.up.isDown)
+    else if (cursors.up.isDown || isWDown)
     {
         player.setAccelerationY(-400);
 

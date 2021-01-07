@@ -458,6 +458,15 @@ function create ()
 
     // ================ CONTROLS ============================================
     cursors = self.input.keyboard.createCursorKeys();
+    if (window.DeviceMotionEvent){
+        window.addEventListener('devicemotion', deviceMotionHandler);
+    }
+    function deviceMotionHandler(event) {
+        console.log(event);
+        const {rotationRate} = event;
+        console.log(rotationRate);
+        alert(rotationRate);
+    };
 
     // ================ SCORE =========================
     self.text = self.add.text(40, 20, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);

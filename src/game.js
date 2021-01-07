@@ -458,18 +458,39 @@ function create ()
 
     // ================ CONTROLS ============================================
     cursors = self.input.keyboard.createCursorKeys();
-    if (window.DeviceMotionEvent){
-        window.addEventListener('devicemotion', deviceMotionHandler);
-        window.ondevicemotion = deviceMotionHandler;
+    console.log("window.DeviceMotionEvent: ",window.DeviceMotionEvent);
+    console.log("window.DeviceMotionEvent: ",window.DeviceOrientationEvent);
+    function handleOrientation(event) {
+        var absolute = event.absolute;
+        var alpha    = event.alpha;
+        var beta     = event.beta;
+        var gamma    = event.gamma;
+      
+        // Do stuff with the new orientation data
+        console.log("Device Orientation Handler: ");
+        alert(absolute);
+        alert(alpha);
+        alert(beta);
+        alert(gamma);
+      }
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener("deviceorientation", handleOrientation, true);
     }
+    if (window.DeviceMotionEvent){
+        window.ondevicemotion = function(ev) {
+            deviceMotionHandler(ev);
+        };
+    }
+
     function deviceMotionHandler(event) {
         const {rotationRate} = event;
+        console.log("Device Motion Handler: ");
         console.log(rotationRate.alpha);
         console.log(rotationRate.beta);
-        console.log(rotationRate.gama);
+        console.log(rotationRate.gamma);
         alert(rotationRate.alpha);
         alert(rotationRate.beta);
-        alert(rotationRate.gama);
+        alert(rotationRate.gamma);
     };
 
     // ================ SCORE =========================

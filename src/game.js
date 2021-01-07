@@ -457,9 +457,11 @@ function create ()
     // self.physics.add.collider(player, ship);
 
     // ================ CONTROLS ============================================
+
     cursors = self.input.keyboard.createCursorKeys();
     console.log("window.DeviceMotionEvent: ",window.DeviceMotionEvent);
     console.log("window.DeviceMotionEvent: ",window.DeviceOrientationEvent);
+
     function handleOrientation(event) {
         var absolute = event.absolute;
         var alpha    = event.alpha;
@@ -468,11 +470,12 @@ function create ()
       
         // Do stuff with the new orientation data
         console.log("Device Orientation Handler: ");
-        alert(absolute);
-        alert(alpha);
-        alert(beta);
-        alert(gamma);
-      }
+        console.log(absolute);
+        console.log(alpha);
+        console.log(beta);
+        console.log(gamma);
+    }
+    
     if (window.DeviceOrientationEvent) {
         window.addEventListener("deviceorientation", handleOrientation, true);
     }

@@ -460,12 +460,16 @@ function create ()
     cursors = self.input.keyboard.createCursorKeys();
     if (window.DeviceMotionEvent){
         window.addEventListener('devicemotion', deviceMotionHandler);
+        window.ondevicemotion = deviceMotionHandler;
     }
     function deviceMotionHandler(event) {
-        console.log(event);
         const {rotationRate} = event;
-        console.log(rotationRate);
-        alert(rotationRate);
+        console.log(rotationRate.alpha);
+        console.log(rotationRate.beta);
+        console.log(rotationRate.gama);
+        alert(rotationRate.alpha);
+        alert(rotationRate.beta);
+        alert(rotationRate.gama);
     };
 
     // ================ SCORE =========================

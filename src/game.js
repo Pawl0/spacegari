@@ -56,6 +56,8 @@ var SceneA = new Phaser.Class({
 
     create: function ()
     {
+        const getScale = (defaultScale) => window.innerHeight < 1000 ? defaultScale / 1.5 : defaultScale;
+
         this.cameras.main.setBackgroundColor('rgb(0,0,85)');
         face = this.add.image(window.innerWidth/2,window.innerHeight/2, 'bg');
         face.setScale(1.5);
@@ -72,10 +74,11 @@ var SceneA = new Phaser.Class({
         terra = this.add.image(window.innerWidth/2,window.innerHeight/1.5, 'terra');
         terra.setScale(0.5);
         namevariable = this.add.image(window.innerWidth/2, window.innerHeight/4, 'name');
-        namevariable.setScale(0.75);
+        namevariable.setScale(getScale(0.75));
         gari = this.add.image(window.innerWidth/4, window.innerHeight/1.5, 'gari');
+        gari.setScale(getScale(1));
         button = this.add.image(window.innerWidth/1.3, window.innerHeight/1.5, 'button');
-        button.setScale(0.4);
+        button.setScale(getScale(0.4));
         button.setDepth(1);
         button.setInteractive();
         button.on('pointerdown', function () {
@@ -159,11 +162,15 @@ class SceneC extends Phaser.Scene {
             }
         });
         graphics.fillRectShape(rect);
+        const getFontSize = (defaultSize) => {
+            return window.innerHeight < 1000 ? defaultSize / 2.5 : defaultSize;
+        };
         let offY = -100;
-        this.add.bitmapText(width/2, height/2-100+offY, 'carrier_command','Game Over!', 44).setOrigin(0.5);
-        this.add.bitmapText(width/2, height/2+offY, 'carrier_command','Your score: ' + score, 24).setOrigin(0.5);
-        this.add.bitmapText(width/2, height/2+50+offY, 'carrier_command','Press F5 to restart', 14).setOrigin(0.5);
-        this.add.bitmapText(width/2, height/2+150+offY, 'carrier_command','TOP PLAYERS', 15).setOrigin(0.5);
+        let extraOffsetY = window.innerHeight < 1000 ? 20 : 50;
+        this.add.bitmapText(width/2, height/2-(2*extraOffsetY)+offY, 'carrier_command','Game Over!', getFontSize(44)).setOrigin(0.5);
+        this.add.bitmapText(width/2, height/2+offY, 'carrier_command','Your score: ' + score, getFontSize(24)).setOrigin(0.5);
+        this.add.bitmapText(width/2, height/2+extraOffsetY+offY, 'carrier_command','Press F5 to restart', getFontSize(14)).setOrigin(0.5);
+        this.add.bitmapText(width/2, height/2+(3*extraOffsetY)+offY, 'carrier_command','TOP PLAYERS', getFontSize(15)).setOrigin(0.5);
         var person = prompt("Please enter your name", sessionStorage.getItem('name') || '');
         
         if (person != null && score > 0) {
@@ -182,7 +189,7 @@ class SceneC extends Phaser.Scene {
         let i = 1;
         topTenScores.pop(); //when counting, from 1 to 10, you only need 9 items
         for (let person of topTenScores) {
-            this.add.bitmapText(width/2, height/2+160+offY+i*25, 'carrier_command',`${i++} ${person.name}: ${person.score}`, 10).setOrigin(0.5);
+            this.add.bitmapText(width/2, height/2+(3*(extraOffsetY)+10)+offY+i*25, 'carrier_command',`${i++} ${person.name}: ${person.score}`, getFontSize(10)).setOrigin(0.5);
         }
         
         this.input.once('pointerdown', function () {
@@ -209,16 +216,19 @@ class SceneD extends Phaser.Scene {
         let {width, height} = self.sys.game.canvas;
         let rect = new Phaser.Geom.Rectangle(0, 0, width, height);
 
+        const getTextFontSize = (defaultFontSize) => window.innerHeight < 1000 ? defaultFontSize / 2 : defaultFontSize;
+
         this.cameras.main.setBackgroundColor('rgb(0,0,85)');
         face = this.add.image(window.innerWidth/2,window.innerHeight/2, 'bg');
         face.setScale(1.5);
 
-        let offY = -100;
-        this.add.bitmapText(width/2, height/2-100+offY, 'carrier_command',textTitle, 44).setOrigin(0.5);
+        let offY = window.innerHeight < 1000 ? -50 : -100;
+        const extraOffY = window.innerHeight < 1000 ? 20 : -100;
+        this.add.bitmapText(width/2, height/2-extraOffY+offY, 'carrier_command',textTitle, getTextFontSize(44)).setOrigin(0.5);
         this.add.image(window.innerWidth/6, window.innerHeight/1.3, 'gari');
         let i = 1;
         for (let text of textsToShow[textToShow]) {
-            this.add.bitmapText(width/2, height/2+offY+i*25, 'carrier_command',text, 10).setOrigin(0.5);
+            this.add.bitmapText(width/2, height/2+offY+i*25, 'carrier_command',text, getTextFontSize(10)).setOrigin(0.5);
             i++;
         }
 
@@ -240,8 +250,8 @@ class SceneD extends Phaser.Scene {
 
 let config = {
     type: Phaser.AUTO,
-    width: window.innerWidth * window.devicePixelRatio, 
-    height: window.innerHeight * window.devicePixelRatio,
+    width: "100%", 
+    height: "100vh",
     physics: {
         default: 'arcade',
         arcade: {

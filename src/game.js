@@ -216,7 +216,7 @@ class SceneD extends Phaser.Scene {
         let {width, height} = self.sys.game.canvas;
         let rect = new Phaser.Geom.Rectangle(0, 0, width, height);
 
-        const getTextFontSize = (defaultFontSize) => window.innerHeight < 1000 ? defaultFontSize / 2 : defaultFontSize;
+        const getTextFontSize = (defaultFontSize) => window.innerHeight < 700 ? defaultFontSize / 2 : defaultFontSize;
 
         this.cameras.main.setBackgroundColor('rgb(0,0,85)');
         face = this.add.image(window.innerWidth/2,window.innerHeight/2, 'bg');

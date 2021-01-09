@@ -1,7 +1,7 @@
 let self = null;
 let score = 0;
 updateTopTen();
-
+let overlay = document.querySelector('#overlay');
 
 let textsToShow = [
     [
@@ -29,11 +29,13 @@ let textToShow = 0;
 
 var SceneA = new Phaser.Class({
 
+
     Extends: Phaser.Scene,
     initialize:
 
     function SceneA ()
     {
+        overlay.style.display = "none";
         Phaser.Scene.call(this, { key: 'titleScreen' });
     },
 
@@ -145,6 +147,7 @@ class SceneC extends Phaser.Scene {
 
     create ()
     {
+        overlay.style.display ="none";
         let {width, height} = self.sys.game.canvas;
         let rect = new Phaser.Geom.Rectangle(0, 0, width, height);
 
@@ -224,6 +227,8 @@ class SceneD extends Phaser.Scene {
         this.input.once('pointerdown', function () {
 
             console.log('From SceneC to SceneB');
+            
+            overlay.style.display = "flex";
 
             this.scene.stop('Text');
             togglePause();
@@ -459,43 +464,7 @@ function create ()
     // ================ CONTROLS ============================================
 
     cursors = self.input.keyboard.createCursorKeys();
-    console.log("window.DeviceMotionEvent: ",window.DeviceMotionEvent);
-    console.log("window.DeviceMotionEvent: ",window.DeviceOrientationEvent);
-
-    function handleOrientation(event) {
-        var absolute = event.absolute;
-        var alpha    = event.alpha;
-        var beta     = event.beta;
-        var gamma    = event.gamma;
-      
-        // Do stuff with the new orientation data
-        console.log("Device Orientation Handler: ");
-        console.log(absolute);
-        console.log(alpha);
-        console.log(beta);
-        console.log(gamma);
-    }
     
-    if (window.DeviceOrientationEvent) {
-        window.addEventListener("deviceorientation", handleOrientation, true);
-    }
-    if (window.DeviceMotionEvent){
-        window.ondevicemotion = function(ev) {
-            deviceMotionHandler(ev);
-        };
-    }
-
-    function deviceMotionHandler(event) {
-        const {rotationRate} = event;
-        console.log("Device Motion Handler: ");
-        console.log(rotationRate.alpha);
-        console.log(rotationRate.beta);
-        console.log(rotationRate.gamma);
-        alert(rotationRate.alpha);
-        alert(rotationRate.beta);
-        alert(rotationRate.gamma);
-    };
-
     // ================ SCORE =========================
     self.text = self.add.text(40, 20, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
     self.textAltitude = self.add.text(40, height-40, '', { font: '16px Courier', fill: '#ffca5f' }).setDepth(1).setScrollFactor(0);
@@ -667,6 +636,24 @@ function damage (ship, junk) {
     }
 }
 
+function stopShip() {
+    console.log("stopShip");
+    isWDown = false;
+    isSDown = false;
+}
+
+function goUp() {
+    console.log("goUp");
+    isWDown = true;
+    isSDown = false;
+}
+
+
+function goDown() {
+    console.log("goDown");
+    isSDown = true;
+    isWDown = false;
+}
 
 function update() {
     self.text.setText("SCORE: " + score);
